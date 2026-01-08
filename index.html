@@ -1,0 +1,219 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MineDrop Style Burst Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              sky: "#63C5F9",
+              grass: "#7ACA3B",
+              dirt: "#936037",
+              stone: "#9E9E9E",
+              gold: "#FCD73E",
+              diamond: "#6AF0F0",
+              obsidian: "#282030",
+              chest: "#D28C46",
+              "ui-bg": "#1e293b",
+            },
+            fontFamily: {
+              display: ["VT323", "monospace"],
+              body: ["Roboto", "sans-serif"],
+              pixel: ["'Press Start 2P'", "cursive"],
+            },
+            boxShadow: {
+              'pixel-inset': 'inset -4px -4px 0px 0px rgba(0,0,0,0.2), inset 4px 4px 0px 0px rgba(255,255,255,0.25)',
+              'pixel-outset': 'inset -4px -4px 0px 0px rgba(0,0,0,0.3), inset 4px 4px 0px 0px rgba(255,255,255,0.5), 4px 4px 0px 0px rgba(0,0,0,0.2)',
+            }
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .pixel-text-shadow {
+          text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+        }
+        .bg-pattern-dirt {
+          background-color: #936037;
+          background-image: 
+            linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1)), 
+            linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1));
+          background-position: 0 0, 10px 10px;
+          background-size: 20px 20px;
+        }
+        
+        /* Block Textures */
+        .block-border { border: 2px solid black; }
+        
+        .block-grass { background-color: #936037; position: relative; }
+        .block-grass::before {
+          content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 33.33%;
+          background-color: #89e44d; border-bottom: 2px solid black; box-sizing: border-box;
+        }
+
+        .block-dirt {
+          background-color: #936037;
+          background-image:
+            linear-gradient(45deg, rgba(0,0,0,0.1) 12.5%, transparent 12.5%, transparent 25%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 37.5%, transparent 37.5%, transparent 62.5%, rgba(0,0,0,0.1) 62.5%, rgba(0,0,0,0.1) 75%, transparent 75%, transparent 87.5%, rgba(0,0,0,0.1) 87.5%),
+            linear-gradient(135deg, rgba(0,0,0,0.1) 12.5%, transparent 12.5%, transparent 25%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 37.5%, transparent 37.5%, transparent 62.5%, rgba(0,0,0,0.1) 62.5%, rgba(0,0,0,0.1) 75%, transparent 75%, transparent 87.5%, rgba(0,0,0,0.1) 87.5%);
+          background-size: 8px 8px; background-position: 0px 0px, 4px 4px;
+        }
+
+        .block-stone {
+          background-color: #9E9E9E;
+          background-image:
+            linear-gradient(45deg, rgba(0,0,0,0.1) 10%, transparent 10%, transparent 40%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.1) 50%, transparent 50%, transparent 80%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0.1) 90%, transparent 90%),
+            linear-gradient(135deg, rgba(0,0,0,0.1) 10%, transparent 10%, transparent 40%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.1) 50%, transparent 50%, transparent 80%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0.1) 90%, transparent 90%);
+          background-size: 10px 10px; background-position: 0px 0px, 5px 5px;
+        }
+
+        .block-ruby-ore {
+          background-color: #9E9E9E; position: relative; overflow: hidden;
+          background-image:
+            linear-gradient(45deg, rgba(0,0,0,0.1) 10%, transparent 10%, transparent 40%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.1) 50%, transparent 50%, transparent 80%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0.1) 90%, transparent 90%),
+            linear-gradient(135deg, rgba(0,0,0,0.1) 10%, transparent 10%, transparent 40%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.1) 50%, transparent 50%, transparent 80%, rgba(0,0,0,0.1) 80%, rgba(0,0,0,0.1) 90%, transparent 90%);
+          background-size: 10px 10px; background-position: 0px 0px, 5px 5px;
+        }
+
+        .ruby-gem {
+          position: absolute; background-color: #EF4444; width: 6px; height: 6px;
+          box-shadow: 1px 1px 0px rgba(0,0,0,0.2) inset, -1px -1px 0px rgba(255,255,255,0.4) inset; transform: rotate(45deg);
+        }
+
+        .block-gold {
+          background-color: #FCD73E;
+          background-image:
+            linear-gradient(45deg, rgba(0,0,0,0.15) 15%, transparent 15%, transparent 35%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.15) 50%, transparent 50%, transparent 70%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.15) 85%, transparent 85%),
+            linear-gradient(135deg, rgba(0,0,0,0.15) 15%, transparent 15%, transparent 35%, rgba(0,0,0,0.15) 35%, rgba(0,0,0,0.15) 50%, transparent 50%, transparent 70%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.15) 85%, transparent 85%);
+          background-size: 12px 12px; background-position: 0px 0px, 6px 6px;
+        }
+
+        .block-diamond {
+          background-color: #6AF0F0; position: relative; overflow: hidden;
+        }
+        .block-diamond::before {
+          content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+          background: linear-gradient(45deg, rgba(255,255,255,0.4) 10%, transparent 10%, transparent 30%, rgba(255,255,255,0.4) 30%, rgba(255,255,255,0.4) 50%, transparent 50%, transparent 70%, rgba(255,255,255,0.4) 70%, rgba(255,255,255,0.4) 90%, transparent 90%);
+          background-size: 16px 16px;
+        }
+
+        .block-obsidian {
+          background-color: #282030;
+          background-image:
+            linear-gradient(45deg, rgba(255,255,255,0.05) 10%, transparent 10%, transparent 40%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.05) 50%, transparent 50%, transparent 80%, rgba(255,255,255,0.05) 80%, rgba(255,255,255,0.05) 90%, transparent 90%),
+            linear-gradient(135deg, rgba(255,255,255,0.05) 10%, transparent 10%, transparent 40%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.05) 50%, transparent 50%, transparent 80%, rgba(255,255,255,0.05) 80%, rgba(255,255,255,0.05) 90%, transparent 90%);
+          background-size: 8px 8px;
+        }
+
+        .ghast-tentacle { width: 10px; height: 25px; background-color: white; box-shadow: inset -2px -2px 0 rgba(0,0,0,0.1); }
+        .cloud-pixel {
+          box-shadow: 20px 0px 0 0 white, 40px 0px 0 0 white, 60px 0px 0 0 white, -20px 20px 0 0 white, 0px 20px 0 0 white, 20px 20px 0 0 white, 40px 20px 0 0 white, 60px 20px 0 0 white, 80px 20px 0 0 white, 0px 40px 0 0 white, 20px 40px 0 0 white, 40px 40px 0 0 white, 60px 40px 0 0 white;
+          width: 20px; height: 20px; background: white; opacity: 0.8;
+        }
+
+        .crack-texture {
+          background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l40 40M40 0L0 40M20 0v40M0 20h40' stroke='rgba(0,0,0,0.6)' stroke-width='3' fill='none'/%3E%3C/svg%3E");
+          background-size: cover;
+        }
+
+        @keyframes particle-fade {
+          0% { transform: translate(0, 0) rotate(0deg) scale(1.2); opacity: 1; }
+          100% { transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(180deg) scale(0); opacity: 0; }
+        }
+        .particle {
+          animation: particle-fade 0.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+        }
+
+        @keyframes block-shatter {
+          0% { transform: scale(1); filter: brightness(1); }
+          20% { transform: scale(1.1); filter: brightness(2); }
+          100% { transform: scale(0); filter: brightness(5); opacity: 0; }
+        }
+        .animate-shatter {
+          animation: block-shatter 0.4s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards;
+        }
+
+        @keyframes block-hit {
+          0% { transform: scale(1); }
+          50% { transform: scale(0.9); }
+          100% { transform: scale(1); }
+        }
+        .animate-hit {
+          animation: block-hit 0.15s ease-in-out;
+        }
+        
+        /* New Reel Spin Animation */
+        @keyframes reel-blur-vertical {
+          0% { transform: translateY(-5px); filter: blur(2px); opacity: 0.8; }
+          50% { transform: translateY(5px); filter: blur(5px); opacity: 0.4; }
+          100% { transform: translateY(-5px); filter: blur(2px); opacity: 0.8; }
+        }
+        .animate-reel-spin {
+          animation: reel-blur-vertical 0.12s ease-in-out infinite;
+        }
+      }
+
+      @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
+      @keyframes float-ghast { 0%, 100% { transform: translate(0px, 0px); } 50% { transform: translate(-20px, -15px); } }
+      .animate-float { animation: float 4s ease-in-out infinite; }
+      .animate-ghast { animation: float-ghast 6s ease-in-out infinite; }
+
+      @keyframes shake {
+        0% { transform: translate(2px, 2px) rotate(0deg); }
+        10% { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+      }
+      .camera-shake { animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both; }
+
+      @keyframes chest-reveal {
+        0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+        60% { transform: scale(1.2) rotate(10deg); opacity: 1; }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      }
+      .animate-chest-reveal { animation: chest-reveal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+      @keyframes glow-burst {
+        0% { transform: scale(0.5); opacity: 1; }
+        100% { transform: scale(2.5); opacity: 0; }
+      }
+      .animate-glow-burst { animation: glow-burst 0.8s ease-out forwards; }
+
+      @keyframes explosion-blast {
+        0% { transform: scale(0.2); opacity: 1; }
+        100% { transform: scale(3.5); opacity: 0; }
+      }
+      .animate-explosion { animation: explosion-blast 0.6s ease-out forwards; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@^19.2.3",
+          "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+          "react/": "https://esm.sh/react@^19.2.3/"
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-sky">
+    <div id="root"></div>
+  </body>
+</html>
