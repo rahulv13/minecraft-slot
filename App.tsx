@@ -14,6 +14,7 @@ const App: React.FC = () => {
     bet: INITIAL_BET,
     reels: GameEngine.generateReels(),
     grid: GameEngine.generateInitialGrid(),
+    chestMultipliers: GameEngine.generateChestMultipliers(),
     isSpinning: false,
     isBonusMode: false,
     bonusSpinsLeft: 0,
@@ -103,6 +104,7 @@ const App: React.FC = () => {
         x,
         finalColumnReel,
         gameState.grid, // use current grid
+        gameState.chestMultipliers,
         gameState.bet,
         gameState.isBonusMode
       );
@@ -190,7 +192,8 @@ const App: React.FC = () => {
       setGameState(prev => ({
         ...prev,
         isSpinning: false,
-        grid: GameEngine.generateInitialGrid() 
+        grid: GameEngine.generateInitialGrid(),
+        chestMultipliers: GameEngine.generateChestMultipliers()
       }));
     }, 1200);
   };
@@ -275,7 +278,34 @@ const App: React.FC = () => {
               </React.Fragment>
             ))}
           </div>
-          <div className="h-4 w-full bg-[#4a4a4a] border-t-2 border-black/50 shadow-inner"></div>
+
+          {/* CHEST ROW */}
+          <div className="grid grid-cols-5 bg-[#3e2723] border-t-4 border-black/50 p-1 gap-1 h-16">
+            {gameState.chestMultipliers.map((mult, i) => {
+              const isCleared = gameState.grid[i].every(b => b.destroyed);
+              return (
+                <div
+                  key={`chest-${i}`}
+                  className={`
+                    relative flex items-center justify-center border-2 rounded transition-all duration-500
+                    ${isCleared
+                      ? 'bg-yellow-400 border-yellow-200 shadow-[0_0_15px_rgba(250,204,21,0.8)] scale-110 -translate-y-2 z-10'
+                      : 'bg-[#5d4037] border-[#3e2723] opacity-80'
+                    }
+                  `}
+                >
+                  <div className="flex flex-col items-center">
+                    <span className={`material-symbols-outlined text-3xl ${isCleared ? 'text-black animate-bounce' : 'text-yellow-600'}`}>
+                      {isCleared ? 'lock_open' : 'lock'}
+                    </span>
+                    <span className={`font-bold vt323 text-lg leading-none ${isCleared ? 'text-black' : 'text-yellow-500'}`}>
+                      {mult}x
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {showWinPopup && (

@@ -49,6 +49,24 @@ export class GameEngine {
     return grid;
   }
 
+  static generateChestMultipliers(): number[] {
+    const chests: number[] = [];
+    for (let x = 0; x < 5; x++) {
+      const totalWeight = this.CHEST_CONFIG.reduce((sum, item) => sum + item.weight, 0);
+      let rand = Math.random() * totalWeight;
+      let selectedMult = 10;
+      for (const item of this.CHEST_CONFIG) {
+        if (rand <= item.weight) {
+          selectedMult = item.multiplier;
+          break;
+        }
+        rand -= item.weight;
+      }
+      chests.push(selectedMult);
+    }
+    return chests;
+  }
+
   static generateRandomBlock(x: number, y: number): BlockState {
     let type = BlockType.DIRT;
 
@@ -84,9 +102,7 @@ export class GameEngine {
       currentHp: stats.hp,
       maxHp: stats.hp,
       payoutMultiplier: stats.payout,
-      destroyed: false,
-      hasChest: false,
-      chestValue: 0
+      destroyed: false
     };
   }
 
@@ -129,6 +145,7 @@ export class GameEngine {
     x: number,
     columnReel: ReelCell[],
     currentGrid: BlockState[][],
+    chestMultipliers: number[],
     bet: number,
     isBonusMode: boolean
   ): {
@@ -186,9 +203,36 @@ export class GameEngine {
       }
     }
 
+    // Check for Column Clear (Chest Unlocking)
+    let isColumnCleared = true;
+    for (let y = 0; y < 6; y++) {
+      if (!newGrid[x][y].destroyed) {
+        isColumnCleared = false;
+        break;
+      }
+    }
+
+    let chestWin = 0;
+    if (isColumnCleared) {
+      // Award the chest multiplier for this column
+      // Note: We check if the chest was *already* awarded by checking if the grid was already cleared
+      // But based on the game flow, we calculate outcomes incrementally.
+      // However, calculateColumnOutcome is called repeatedly or once per spin?
+      // The App logic calls it once per column per spin.
+      // So if it clears NOW, we award it.
+      // We need to ensure we don't award it twice if we re-calculate, but the App uses the NEW grid state.
+      // So checking `!currentGrid[x][last_row].destroyed` vs `newGrid[x][last_row].destroyed` is a good way
+      // to see if it JUST got cleared.
+
+      const wasClearedBefore = currentGrid[x].every(b => b.destroyed);
+      if (!wasClearedBefore) {
+         chestWin = chestMultipliers[x];
+      }
+    }
+
     return {
       newGrid,
-      payout: totalPayout * bet,
+      payout: (totalPayout * bet) + (chestWin * bet),
       eyesInColumn,
       upgradedColumnReel
     };
@@ -213,25 +257,6 @@ export class GameEngine {
 
     if (block.type === BlockType.TNT) {
       payout += this.triggerExplosion(grid, x, y, isBonus);
-    }
-
-    if (isBonus) {
-      const depthChance = 0.2 + (y * 0.02);
-      if (Math.random() < depthChance) {
-        block.hasChest = true;
-        const totalWeight = this.CHEST_CONFIG.reduce((sum, item) => sum + item.weight, 0);
-        let rand = Math.random() * totalWeight;
-        let selectedMult = 10;
-        for (const item of this.CHEST_CONFIG) {
-          if (rand <= item.weight) {
-            selectedMult = item.multiplier;
-            break;
-          }
-          rand -= item.weight;
-        }
-        block.chestValue = selectedMult;
-        payout += selectedMult;
-      }
     }
 
     return payout;
