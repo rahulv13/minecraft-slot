@@ -1,60 +1,31 @@
-
 import React from 'react';
 import { ReelCell, SpecialSymbol, PickaxeType } from '../types';
+import woodenPickaxe from '../assets/pickaxes/wooden.webp';
+import stonePickaxe from '../assets/pickaxes/stone.webp';
+import goldPickaxe from '../assets/pickaxes/gold.webp';
+import diamondPickaxe from '../assets/pickaxes/diamond.webp';
 
 interface ReelSymbolProps {
   cell: ReelCell;
   spinning: boolean;
 }
 
-const PixelPickaxe = ({ type }: { type: PickaxeType }) => {
-  const colors = {
-    [PickaxeType.WOODEN]: { head: '#8B4513', highlight: '#A0522D', handle: '#5D2906' },
-    [PickaxeType.STONE]: { head: '#707070', highlight: '#8B8B8B', handle: '#5D2906' },
-    [PickaxeType.GOLD]: { head: '#FFD700', highlight: '#FFFACD', handle: '#5D2906' },
-    [PickaxeType.DIAMOND]: { head: '#4EE2EC', highlight: '#B9F2FF', handle: '#5D2906' },
+const ReelSymbol: React.FC<ReelSymbolProps> = ({ cell, spinning }) => {
+  const getPickaxeImage = (type: PickaxeType) => {
+    switch (type) {
+      case PickaxeType.WOODEN:
+        return woodenPickaxe;
+      case PickaxeType.STONE:
+        return stonePickaxe;
+      case PickaxeType.GOLD:
+        return goldPickaxe;
+      case PickaxeType.DIAMOND:
+        return diamondPickaxe;
+      default:
+        return woodenPickaxe;
+    }
   };
 
-  const { head, highlight, handle } = colors[type];
-
-  return (
-    <svg viewBox="0 0 16 16" className="w-10 h-10 drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
-      {/* Handle */}
-      <rect x="2" y="13" width="1" height="1" fill={handle} />
-      <rect x="3" y="12" width="1" height="1" fill={handle} />
-      <rect x="4" y="11" width="1" height="1" fill={handle} />
-      <rect x="5" y="10" width="1" height="1" fill={handle} />
-      <rect x="6" y="9" width="1" height="1" fill={handle} />
-      <rect x="7" y="8" width="1" height="1" fill={handle} />
-      <rect x="8" y="7" width="1" height="1" fill={handle} />
-      <rect x="9" y="6" width="1" height="1" fill={handle} />
-      
-      {/* Head Bottom */}
-      <rect x="9" y="5" width="2" height="1" fill={head} />
-      <rect x="10" y="6" width="1" height="2" fill={head} />
-      
-      {/* Head Top Right */}
-      <rect x="11" y="4" width="2" height="1" fill={head} />
-      <rect x="13" y="3" width="1" height="1" fill={head} />
-      <rect x="12" y="5" width="1" height="2" fill={head} />
-      <rect x="13" y="7" width="1" height="1" fill={head} />
-      
-      {/* Head Top Left */}
-      <rect x="8" y="2" width="1" height="2" fill={head} />
-      <rect x="7" y="1" width="1" height="1" fill={head} />
-      <rect x="5" y="3" width="2" height="1" fill={head} />
-      <rect x="3" y="2" width="1" height="1" fill={head} />
-
-      {/* Highlights */}
-      <rect x="12" y="4" width="1" height="1" fill={highlight} />
-      <rect x="10" y="5" width="1" height="1" fill={highlight} />
-      <rect x="8" y="3" width="1" height="1" fill={highlight} />
-      <rect x="6" y="3" width="1" height="1" fill={highlight} />
-    </svg>
-  );
-};
-
-const ReelSymbol: React.FC<ReelSymbolProps> = ({ cell, spinning }) => {
   const renderIcon = () => {
     if (cell.special === SpecialSymbol.EYE) {
       return (
@@ -81,7 +52,13 @@ const ReelSymbol: React.FC<ReelSymbolProps> = ({ cell, spinning }) => {
     }
 
     if (cell.pickaxe) {
-      return <PixelPickaxe type={cell.pickaxe} />;
+      return (
+        <img
+          src={getPickaxeImage(cell.pickaxe)}
+          alt={cell.pickaxe}
+          className="w-10 h-10 object-contain drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]"
+        />
+      );
     }
 
     return null;
