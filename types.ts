@@ -29,8 +29,6 @@ export interface BlockState {
   maxHp: number;
   payoutMultiplier: number;
   destroyed: boolean;
-  hasChest: boolean;
-  chestValue: number;
 }
 
 export interface ReelCell {
@@ -43,6 +41,7 @@ export interface GameState {
   bet: number;
   reels: ReelCell[][];
   grid: BlockState[][];
+  chestMultipliers: number[];
   isSpinning: boolean;
   isBonusMode: boolean;
   bonusSpinsLeft: number;

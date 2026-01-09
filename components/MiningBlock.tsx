@@ -51,10 +51,6 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
     if (block.destroyed && prevHp.current > 0) {
       setShowParticles(true);
       const timer = setTimeout(() => setShowParticles(false), 800);
-      
-      if (block.hasChest) {
-        setShowChestAnimation(true);
-      }
 
       if (block.type === BlockType.TNT) {
         setShowExplosion(true);
@@ -65,15 +61,7 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
       prevHp.current = 0;
       return () => clearTimeout(timer);
     }
-  }, [block.destroyed, block.currentHp, block.hasChest, block.type]);
-
-  const getChestRarityColor = (value: number) => {
-    if (value >= 5000) return "bg-purple-600 border-yellow-400 shadow-[0_0_15px_rgba(255,215,0,0.8)]";
-    if (value >= 1000) return "bg-red-600 border-white shadow-[0_0_10px_rgba(255,0,0,0.6)]";
-    if (value >= 250) return "bg-blue-600 border-cyan-300";
-    if (value >= 100) return "bg-yellow-600 border-orange-400";
-    return "bg-chest border-black/20";
-  };
+  }, [block.destroyed, block.currentHp, block.type]);
 
   const getCrackOpacity = () => {
     if (block.destroyed) return 0;
@@ -90,20 +78,12 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
     if (isHitting) classes += "animate-hit ";
 
     // Bottom row (y=5) is always visual chest in MineDrop mockup if destroyed or reaching end
+    // Logic updated: Chests are now separate row in App.tsx, so y=5 is just a normal dirt/block row visually?
+    // Or we keep it as "bedrock" look?
+    // For now, removing the special logic that tries to read block.chestValue
     if (yIndex === 5) {
-      return (
-        <div className={`w-16 h-16 bg-chest block-border flex items-center justify-center relative ${block.destroyed ? 'bg-opacity-20' : ''}`}>
-          <div className="w-12 h-1 bg-black/30 absolute top-4"></div>
-          <div className="w-4 h-6 bg-gray-300 border border-gray-500 rounded-sm flex items-center justify-center shadow-sm">
-            <div className="w-2 h-3 border border-gray-400 bg-gray-200"></div>
-          </div>
-          {block.destroyed && block.hasChest && (
-            <div className={`absolute inset-0 z-20 flex flex-col items-center justify-center ${getChestRarityColor(block.chestValue)} ${showChestAnimation ? 'animate-chest-reveal' : ''}`}>
-               <span className="text-[11px] font-black text-white drop-shadow-[0_1px_0_rgba(0,0,0,1)]">x{block.chestValue}</span>
-            </div>
-          )}
-        </div>
-      );
+      // Just render it as a normal block for now, or maybe bedrock?
+      // The generateRandomBlock in GameEngine creates DIRT for y=5 usually.
     }
 
     if (block.destroyed) {
