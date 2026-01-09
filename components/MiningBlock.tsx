@@ -1,13 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { BlockState, BlockType, BLOCK_STATS } from '../types';
-import dirtBlock from '../assets/blocks/dirt.webp';
-import grassBlock from '../assets/blocks/grass.webp';
-import stoneBlock from '../assets/blocks/stone.webp';
-import rubyBlock from '../assets/blocks/ruby_ore.webp';
-import goldBlock from '../assets/blocks/gold_block.webp';
-import diamondBlock from '../assets/blocks/diamond_block.webp';
-import obsidianBlock from '../assets/blocks/obsidian.webp';
 
 interface MiningBlockProps {
   block: BlockState;
@@ -41,6 +34,7 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
   const stats = BLOCK_STATS[block.type];
   const hpPercent = (block.currentHp / block.maxHp) * 100;
   const [showParticles, setShowParticles] = useState(false);
+  const [showChestAnimation, setShowChestAnimation] = useState(false);
   const [showExplosion, setShowExplosion] = useState(false);
   const [isHitting, setIsHitting] = useState(false);
   const prevHp = useRef(block.currentHp);
@@ -83,6 +77,15 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
     
     if (isHitting) classes += "animate-hit ";
 
+    // Bottom row (y=5) is always visual chest in MineDrop mockup if destroyed or reaching end
+    // Logic updated: Chests are now separate row in App.tsx, so y=5 is just a normal dirt/block row visually?
+    // Or we keep it as "bedrock" look?
+    // For now, removing the special logic that tries to read block.chestValue
+    if (yIndex === 5) {
+      // Just render it as a normal block for now, or maybe bedrock?
+      // The generateRandomBlock in GameEngine creates DIRT for y=5 usually.
+    }
+
     if (block.destroyed) {
       return (
         <div className="w-16 h-16 bg-dirt/10 flex items-center justify-center relative overflow-visible">
@@ -111,50 +114,35 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
       );
     }
 
-    const getImageSrc = () => {
-      switch (block.type) {
-        case BlockType.DIRT:
-          return yIndex === 0 ? grassBlock : dirtBlock;
-        case BlockType.STONE:
-          return stoneBlock;
-        case BlockType.RUBY:
-          return rubyBlock;
-        case BlockType.GOLD:
-          return goldBlock;
-        case BlockType.DIAMOND:
-          return diamondBlock;
-        case BlockType.OBSIDIAN:
-          return obsidianBlock;
-        case BlockType.TNT:
-          return null; // TNT has no image provided, using fallback styling
-        default:
-          return dirtBlock;
-      }
+    const typeClasses: Record<BlockType, string> = {
+      [BlockType.DIRT]: yIndex === 0 ? "block-grass" : "block-dirt",
+      [BlockType.STONE]: "block-stone",
+      [BlockType.RUBY]: "block-ruby-ore",
+      [BlockType.GOLD]: "block-gold",
+      [BlockType.DIAMOND]: "block-diamond",
+      [BlockType.OBSIDIAN]: "block-obsidian",
+      [BlockType.TNT]: "bg-red-600 border-red-800 flex items-center justify-center",
     };
 
-    const imgSrc = getImageSrc();
-
-    // Base styling for the block container.
-    // If it's TNT (no image), we keep the CSS styling.
-    const containerClass = block.type === BlockType.TNT
-      ? "bg-red-600 border-red-800 flex items-center justify-center"
-      : "";
+    classes += typeClasses[block.type] || "block-dirt";
 
     return (
-      <div className={`${classes} ${containerClass}`}>
-        {imgSrc && (
-          <img
-            src={imgSrc}
-            alt={block.type}
-            className="absolute inset-0 w-full h-full object-cover pixelated"
-          />
-        )}
-
+      <div className={classes}>
         {/* Crack Overlay */}
         <div 
           className="absolute inset-0 crack-texture pointer-events-none transition-opacity duration-200 z-10"
           style={{ opacity: getCrackOpacity() }}
         />
+
+        {block.type === BlockType.RUBY && (
+          <div className="z-5">
+            <div className="ruby-gem absolute top-2 left-2"></div>
+            <div className="ruby-gem absolute top-2 right-2"></div>
+            <div className="ruby-gem absolute top-6 left-1/2 -translate-x-1/2"></div>
+            <div className="ruby-gem absolute bottom-2 left-2"></div>
+            <div className="ruby-gem absolute bottom-2 right-2"></div>
+          </div>
+        )}
         
         {block.type === BlockType.TNT && (
           <span className="text-white font-bold text-xs pixel-text-shadow z-10">TNT</span>
