@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { BlockState, BlockType, BLOCK_STATS } from '../types';
-import dirtBlock from '../assets/blocks/dirt.jpg';
-import grassBlock from '../assets/blocks/grass.jpg';
+import dirtBlock from '../assets/blocks/bg_dirt.png';
+import grassDirtBlock from '../assets/blocks/bg_grass_dirt.png';
 import stoneBlock from '../assets/blocks/stone.jpg';
 import rubyBlock from '../assets/blocks/ruby_ore.png';
-import goldBlock from '../assets/blocks/gold_block.jpg';
-import diamondBlock from '../assets/blocks/diamond_block.jpg';
+import goldBlock from '../assets/blocks/bg_gold.png';
+import diamondBlock from '../assets/blocks/bg_diamond.png';
 import obsidianBlock from '../assets/blocks/obsidian.png';
 
 interface MiningBlockProps {
@@ -114,7 +114,7 @@ const MiningBlock: React.FC<MiningBlockProps> = ({ block, yIndex }) => {
     const getImageSrc = () => {
       switch (block.type) {
         case BlockType.DIRT:
-          return yIndex === 0 ? grassBlock : dirtBlock;
+          return yIndex === 0 ? grassDirtBlock : dirtBlock;
         case BlockType.STONE:
           return stoneBlock;
         case BlockType.RUBY:
