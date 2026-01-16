@@ -4,6 +4,7 @@ import { GameState, BlockState, ReelCell, SpecialSymbol, BlockType, PICKAXE_STAT
 import { GameEngine } from './services/gameEngine';
 import MiningBlock from './components/MiningBlock';
 import ReelSymbol from './components/ReelSymbol';
+import chestImage from './assets/chest.jpg';
 
 const INITIAL_BET = 1.00;
 const INITIAL_BALANCE = 1000.00;
@@ -287,18 +288,27 @@ const App: React.FC = () => {
                 <div
                   key={`chest-${i}`}
                   className={`
-                    relative flex items-center justify-center border-2 rounded transition-all duration-500
+                    relative flex items-center justify-center border-2 rounded transition-all duration-500 overflow-hidden
                     ${isCleared
                       ? 'bg-yellow-400 border-yellow-200 shadow-[0_0_15px_rgba(250,204,21,0.8)] scale-110 -translate-y-2 z-10'
                       : 'bg-[#5d4037] border-[#3e2723] opacity-80'
                     }
                   `}
                 >
-                  <div className="flex flex-col items-center">
-                    <span className={`material-symbols-outlined text-3xl ${isCleared ? 'text-black animate-bounce' : 'text-yellow-600'}`}>
-                      {isCleared ? 'lock_open' : 'lock'}
-                    </span>
-                    <span className={`font-bold vt323 text-lg leading-none ${isCleared ? 'text-black' : 'text-yellow-500'}`}>
+                  <img
+                    src={chestImage}
+                    alt="Chest"
+                    className={`absolute inset-0 w-full h-full object-cover pixelated ${isCleared ? 'opacity-20' : 'opacity-100'}`}
+                  />
+                  <div className="flex flex-col items-center z-10 relative">
+                     {/* Show Chest Image as Icon if cleared, or just text overlay?
+                         User just said "use this for chest".
+                         Let's just show the multiplier text prominently over the chest background.
+                     */}
+                    <div className={`w-8 h-8 ${isCleared ? 'animate-bounce' : ''}`}>
+                      <img src={chestImage} alt="Chest Icon" className="w-full h-full object-contain pixelated drop-shadow-md" />
+                    </div>
+                    <span className={`font-bold vt323 text-lg leading-none drop-shadow-[2px_2px_0_rgba(0,0,0,1)] ${isCleared ? 'text-black' : 'text-white'}`}>
                       {mult}x
                     </span>
                   </div>
